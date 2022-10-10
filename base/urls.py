@@ -3,5 +3,5 @@ from base import views
 
 urlpatterns = [
     path('', views.home, name="home"),
-    path('iss', views.iss, name="iss")
+    path('pitch/<str:pitch_id>', views.pitch, name="pitch")
 ]

@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h1>Home template</h1>
+
+<div>
+    <ul>
+        {% for pitch in pitchs %}
+        <li><a href="{% url 'pitch' pitch.id %}">{{ pitch.id }} -- {{ pitch.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock content %}
