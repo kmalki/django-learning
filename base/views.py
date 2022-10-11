@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Pitch, GameSession, User
+from .models import Pitch, GameSession, User, Sport
 from .forms import GameSessionForm
 
 
@@ -7,8 +7,15 @@ from .forms import GameSessionForm
 
 
 def home(request):
-    games = GameSession.objects.all()
-    return render(request, 'base/home.html', {'games': games})
+    if request.GET.get('sport') is not None:
+        sport_param = request.GET.get('sport')
+        sport = Sport.objects.filter(name=sport_param).first()
+        games = GameSession.objects.filter(pitch__sport__id=sport.id)
+        sports = [sport]
+    else:
+        games = GameSession.objects.all()
+        sports = Sport.objects.all()
+    return render(request, 'base/home.html', {'games': games, 'sports': sports})
 
 
 def pitch(request, pitch_id):
