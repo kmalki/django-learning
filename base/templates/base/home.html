@@ -1,14 +1,66 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<h1>Home template</h1>
+<h1>Game sessions scheduled</h1>
 
 <div>
-    <ul>
-        {% for pitch in pitchs %}
-        <li><a href="{% url 'pitch' pitch.id %}">{{ pitch.id }} -- {{ pitch.name }}</a></li>
-        {% endfor %}
-    </ul>
+    <a href="{% url 'create_game_session' %}">Create a new game session</a>
 </div>
+<hr>
+
+{% for game in games %}
+<div>
+    <table>
+        <tr>
+            <th>
+                Sport
+            </th>
+            <th>
+                Organisator
+            </th>
+            <th>
+                Field
+            </th>
+            <th>
+                Game Time
+            </th>
+            <th>
+                Hours
+            </th>
+            <th>
+                Price per hour
+            </th>
+            <th>
+                Places left
+            </th>
+        </tr>
+        <tr>
+            <td>{{ game.pitch.sport.name }}</td>
+            <td><a href="{% url 'user' game.leader.id %}">@{{ game.leader }}</a></td>
+            <td><a href="{% url 'pitch' game.pitch.id %}">{{ game.pitch.name }}</a></td>
+            <td>{{ game.game_begin }}</td>
+            <td>{{ game.hours }}</td>
+            <td>{{ game.price_per_hour }}</td>
+            <td>{{ game.nb_places }}</td>
+            <td>
+                <form action="{% url 'game_session' game.id %}">
+                    <input type="submit" value="Book!"/>
+                </form>
+            </td>
+            <td>
+                <form action="{% url 'update_game_session' game.id %}">
+                    <input type="submit" value="Edit!"/>
+                </form>
+            </td>
+            <td>
+                <form action="{% url 'delete_game_session' game.id %}">
+                    <input type="submit" value="Delete!"/>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+<hr>
+{% endfor %}
 
 {% endblock content %}

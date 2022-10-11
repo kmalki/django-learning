@@ -1,20 +1,61 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .models import Pitch, GameSession, User
+from .forms import GameSessionForm
+
 
 # Create your views here.
 
-pitchs = [{'id': 1, 'name': 'Terrain 1'}, {'id': 2, 'name': 'Terrain 2'}, {'id': 3, 'name': 'Terrain 3'},
-          {'id': 4, 'name': 'Terrain 4'}]
-
 
 def home(request):
-    return render(request, 'base/home.html', {'pitchs': pitchs})
+    games = GameSession.objects.all()
+    return render(request, 'base/home.html', {'games': games})
 
 
 def pitch(request, pitch_id):
-    p_res = None
-    for p in pitchs:
-        if p['id'] == int(pitch_id):
-            p_res = p
-    print(p_res)
-    return render(request, 'base/pitch.html', {'pitch': p_res})
+    p_res = Pitch.objects.get(id=int(pitch_id))
+    games = GameSession.objects.filter(pitch=p_res)
+    return render(request, 'base/pitch.html', {'pitch': p_res, 'games_session': games})
+
+
+def user(request, user_id):
+    u_res = User.objects.get(id=int(user_id))
+    return render(request, 'base/user.html', {'user': u_res})
+
+
+def game_session(request, game_id):
+    g_res = GameSession.objects.get(id=int(game_id))
+    return render(request, 'base/game_session.html', {'game_session': g_res})
+
+
+def create_game_session(request):
+    form = GameSessionForm
+    if request.method == 'POST':
+        form = GameSessionForm(request.POST)
+        if form.is_valid():
+            print("no error")
+            game = form.save()
+            return redirect('game_session', game.id)
+        else:
+            return render(request, 'base/game_session_form.html', {'form': form, 'error': True, 'type': 'create'})
+    return render(request, 'base/game_session_form.html', {'form': form, 'type': 'create'})
+
+
+def update_game_session(request, game_id):
+    game = GameSession.objects.get(id=game_id)
+    form = GameSessionForm(instance=game)
+    if request.method == 'POST':
+        form = GameSessionForm(request.POST, instance=game)
+        if form.is_valid():
+            game = form.save()
+            return redirect('game_session', game.id)
+        else:
+            return render(request, 'base/game_session_form.html', {'form': form, 'error': True, 'type': 'edit'})
+    return render(request, 'base/game_session_form.html', {'form': form, 'type': 'edit'})
+
+
+def delete_game_session(request, game_id):
+    game = GameSession.objects.get(id=game_id)
+    if request.method == "POST":
+        game.delete()
+        return redirect('home')
+    return render(request, 'base/delete.html', {'object': game})

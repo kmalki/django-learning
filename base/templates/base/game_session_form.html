@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+
+{% block content %}
+{% if error %}
+<div>
+    Error form invalid
+</div>
+{% endif %}
+<div>
+    <form method="POST" action="">
+        {% csrf_token %}
+        {{form.as_p}}
+        {% if type == "create" %}
+        <input type="submit" value="Create">
+        {% endif %}
+        {% if type == "edit" %}
+        <input type="submit" value="Edit">
+        {% endif %}
+    </form>
+</div>
+{% endblock content %}

@@ -1,10 +1,56 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<h1>Pitch template</h1>
+<h1>{{ pitch.name }}</h1>
 
 <div>
-    <h2>Pitch #{{ pitch.id }} : {{ pitch.name }}</h2>
+
+    {% for game in games_session %}
+    <div>
+        <table>
+            <tr>
+                <th>
+                    Organisator
+                </th>
+                <th>
+                    Game Time
+                </th>
+                <th>
+                    Hours
+                </th>
+                <th>
+                    Price per hour
+                </th>
+                <th>
+                    Places left
+                </th>
+            </tr>
+            <tr>
+                <td><a href="{% url 'user' game.leader.id %}">@{{ game.leader }}</a></td>
+                <td>{{ game.game_begin }}</td>
+                <td>{{ game.hours }}</td>
+                <td>{{ game.price_per_hour }}</td>
+                <td>{{ game.nb_places }}</td>
+                <td>
+                    <form action="{% url 'game_session' game.id %}">
+                        <input type="submit" value="Book!"/>
+                    </form>
+                </td>
+                <td>
+                    <form action="{% url 'update_game_session' game.id %}">
+                        <input type="submit" value="Edit!"/>
+                    </form>
+                </td>
+                <td>
+                    <form action="{% url 'delete_game_session' game.id %}">
+                        <input type="submit" value="Delete!"/>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <hr>
+    {% endfor %}
 </div>
 
 {% endblock content %}
