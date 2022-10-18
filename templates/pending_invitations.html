@@ -1,0 +1,28 @@
+{% block content %}
+    <!--{% if request.user.is_authenticated %}-->
+        <div>
+            <h3>Pending invitations</h3>
+            {% for pending in request.user.pending.all %}
+                {% if pending.nb_places > 0 %}
+                    <div>
+                        <p>From <a href="{% url 'user' pending.leader.id %}">@{{ pending.leader.username }}</a></p>
+                        <p>{{ pending.hours }}h game of {{ pending.pitch.sport.name }}, {{ pending.game_begin }}</p>
+                        <p>{{ pending.nb_places }} places left</p>
+                        <p>{{ pending.price_per_hour }}€ per hour</p>
+                        <p> Game description : {{ pending.description }}</p>
+                        <p>Game informations : <a href="{% url 'game_session' pending.id %}">here</a></p>
+                        <p>
+                        <form method="POST" action="{% url 'join_from_invitation' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="game_id" value="{{ pending.id }}"/>
+                            <input type="submit" value="Join the game"/>
+                        </form>
+                        </p>
+                    </div>
+                    <hr>
+                {% endif %}
+            {% endfor %}
+
+        </div>
+        <!--{% endif %}-->
+{% endblock content %}

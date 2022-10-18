@@ -1,0 +1,15 @@
+
+{% block content %}
+
+    <div>
+        <h3>Browse sports</h3>
+        <div><a href="{% url 'home' %}">All</a></div>
+        <hr>
+        {% for sport in sports %}
+            <div><a href="{% url 'home' %}?sport={{ sport.name }}">{{ sport.name }}</a></div>
+            <hr>
+        {% endfor %}
+
+    </div>
+
+{% endblock content %}

@@ -37,14 +37,18 @@
                     </form>
                 </td>
                 <td>
-                    <form action="{% url 'update_game_session' game.id %}">
-                        <input type="submit" value="Edit!"/>
-                    </form>
+                    {% if game.leader == user %}
+                        <form action="{% url 'update_game_session' game.id %}">
+                            <input type="submit" value="Edit!"/>
+                        </form>
+                    {% endif %}
                 </td>
                 <td>
-                    <form action="{% url 'delete_game_session' game.id %}">
-                        <input type="submit" value="Delete!"/>
-                    </form>
+                    {% if game.leader == user %}
+                        <form action="{% url 'delete_game_session' game.id %}">
+                            <input type="submit" value="Delete!"/>
+                        </form>
+                    {% endif %}
                 </td>
             </tr>
         </table>

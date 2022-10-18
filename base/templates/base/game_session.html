@@ -1,10 +1,156 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<h1>Game template</h1>
+<style>
+        .home-container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+        }
+
+
+
+
+
+
+</style>
 
 <div>
-    {{ game_session.pitch }}
-</div>
 
+    <h1>Game session information</h1>
+    <hr>
+
+</div>
+<div class="home-container">
+    <div>
+        <div>
+            <form action="{% url 'invite_to_game_session' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="game_id" value="{{ game.id }}">
+                <input type="text" name="user_id" placeholder="Invite a user"/>
+                <input type="submit" value="Invite"/>
+            </form>
+            <hr>
+        </div>
+        <div>
+            <h2>Players registered</h2>
+            {% for player in game.players.all %}
+            <div><h3><a href="{% url 'user' player.id %}">{{ player.username }}</a></h3>
+                {% if request.user == game.leader %}
+                <form action="{% url 'remove_player' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                    <input type="hidden" name="player_id" value="{{ player.id }}">
+                    <input type="submit" value="Remove">
+                </form>
+
+                {% endif %}
+            </div>
+            <hr>
+            {% endfor %}
+        </div>
+        <div>
+            <h2>Players pending</h2>
+            {% for player in game.pending.all %}
+            <div><h3><a href="{% url 'user' player.id %}">{{ player.username }}</a></h3>
+                {% if request.user == game.leader %}
+                <form action="{% url 'remove_player' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                    <input type="hidden" name="player_id" value="{{ player.id }}">
+                    <input type="submit" value="Remove">
+                </form>
+
+                {% endif %}
+            </div>
+            <hr>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <table style="table-layout: fixed; width:100%;">
+            <tr>
+                <th>
+                    Sport
+                </th>
+                <th>
+                    Organisator
+                </th>
+                <th>
+                    Field
+                </th>
+                <th>
+                    Game Time
+                </th>
+                <th>
+                    Hours
+                </th>
+                <th>
+                    Price per hour
+                </th>
+                <th>
+                    Places left
+                </th>
+            </tr>
+            <tr>
+                <td>{{ game.pitch.sport.name }}</td>
+                <td><a href="{% url 'user' game.leader.id %}">@{{ game.leader }}</a></td>
+                <td><a href="{% url 'pitch' game.pitch.id %}">{{ game.pitch.name }}</a></td>
+                <td>{{ game.game_begin }}</td>
+                <td>{{ game.hours }}</td>
+                <td>{{ game.price_per_hour }}</td>
+                <td>{{ game.nb_places }}</td>
+            </tr>
+        </table>
+        <hr>
+        <div>
+            <!--                {% regroup game.messages.all by created as messages_list %}-->
+            {% for message in game.messages.all|dictsortreversed:"created" %}
+            <div>
+                <p><a href="{% url 'user' message.user.id %}">@{{ message.user }}</a>
+                    {% if message.user in game.players.all %} &#10004; {% endif %} </p>
+                <p>{{ message.created|timesince }}{% if message.edited %}, edited {{message.updated|timesince}} ago{% endif %}</p>
+                <p>{{ message.body }}</p>
+                <form action="{% url 'up_down_message' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="message_id" value="{{ message.id }}">
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                    <input type="submit" name="up" id="up" value="{{ message.up }} up vote"
+                           {% if request.user in message.down_voted.all %} disabled {% endif %}>
+                    <input type="submit" name="down" value="{{ message.down }} down vote"
+                           {% if request.user in message.up_voted.all %} disabled {% endif %}>
+                </form>
+                <!--                        <button>{{ message.up }} up vote</button>-->
+                <!--                        <button>{{ message.down }} down vote</button>-->
+                {% if request.user == message.user %}
+                <form action="{% url 'remove_message' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="message_id" value="{{ message.id }}">
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                    <br>
+                    <input type="submit" value="Remove post">
+                </form>
+                <a href="{% url 'get_message_edition' game.id message.id %}"><button>Edit post</button></a>
+                {% endif %}
+
+                <hr>
+
+            </div>
+            {% endfor %}
+            <div>
+                <form action="{% url 'add_message' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ request.user.id }}">
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                    <textarea name="message_value"></textarea>
+                    <br>
+                    <input type="submit" value="Add post">
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
 {% endblock content %}

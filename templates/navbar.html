@@ -1,4 +1,36 @@
-<a href="/">
-    <h1>Logo</h1>
-</a>
+{% if request.user.is_authenticated %}
+<div>
+    <div>
+        <h3>Hi {{request.user.username}}</h3>
+    </div>
+    <div>
+<a href="{% url 'logout' %}">
+            <button>Log out</button>
+        </a>
+    </div>
+    <hr>
+</div>
+
+{% else %}
+<div>
+    <a href="{% url 'login' %}">
+        <button>Log in</button>
+    </a>
+    <a href="{% url 'register' %}">
+        <button>Register</button>
+    </a>
+</div>
+{% endif %}
+
+{% if request.get_full_path != "/login" and request.get_full_path != "/register" %}
+<form action="{% url 'search_games' %}" method="GET">
+
+    <input type="text" name="search" placeholder="Search by user or pitch"/>
+    <select name="type">
+        <option value="user">User</option>
+        <option value="pitch">Pitch</option>
+    </select>
+    <input type="submit" value="Search"/>
+</form>
 <hr>
+{% endif %}
